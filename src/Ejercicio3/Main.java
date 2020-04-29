@@ -1,7 +1,6 @@
 package Ejercicio3;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Scanner;
 
 public class Main {
@@ -13,7 +12,8 @@ public class Main {
     double importe;
     int num = 0;
     String nombre = null;
-    double precio = 0;
+    int index = -1;
+    double nuevoPrecio = -1;
 
     public static void main(String[] args) {
         Ejercicio3.Main programa = new Ejercicio3.Main();
@@ -61,20 +61,23 @@ public class Main {
                         } else {
                             mostrarVentas();
                             System.out.println("¿Qué venta quieres borrar?");
-                            System.out.println("introduce artículo");
-                            nombre = getnombre();
-                            System.out.println("Introduce mes");
-                            num = getnumMes();
-                            System.out.println("Introduce importe");
-                            precio = getPrecioArt();
+                            index = getindex();
+                            borrarVenta();
                             break;
                         }
-//                    case 5:
-//                        if(estaVacio()){
-//                            break;
-//                        }else{
-//
-//                            break;}
+                    case 5:
+                        if (estaVacio()) {
+                            break;
+                        } else {
+                            mostrarVentas();
+                            System.out.println("¿Qué venta quieres modificar?");
+                            index = getindex();
+                            System.out.println("¿Qué importe quieres añadir?");
+                            nuevoPrecio = getNuevoPrecio();
+                            modificarPrecio();
+
+                            break;
+                        }
                     case 6:
                         System.out.println("Saliendo.");
                         break;
@@ -289,18 +292,41 @@ public class Main {
 
     public void mostrarVentas() {
         for (int i = 0; i < ventas.size(); i++) {
-            System.out.println(ventas.get(i).toString());
+            System.out.println(i + " - " + ventas.get(i).toString());
         }
     }
 
-    public double getPrecioArt() {
+    public int getindex() {
         boolean exit = false;
-        double precio = -1;
+        do {
+            boolean isNum = input.hasNextInt();
+            if (isNum) {
+                index = input.nextInt();
+                if (index >= 0 && index <= ventas.size() - 1) {
+                    exit = true;
+                } else {
+                    System.out.println("Introduce un número correcto");
+                }
+            } else {
+                System.out.println("Introduce un entero");
+                input.nextLine();
+            }
+        } while (!exit);
+        return index;
+    }
+
+    public void borrarVenta(){
+        ventas.remove(index);
+        System.out.println("venta borrada");
+    }
+
+    public double getNuevoPrecio() {
+        boolean exit = false;
         do {
             boolean isNum = input.hasNextDouble();
             if (isNum) {
-                precio = input.nextDouble();
-                if (precio > 0) {
+                nuevoPrecio = input.nextDouble();
+                if (nuevoPrecio > 0) {
                     exit = true;
                 } else {
                     System.out.println("Introduce un número mayor a 0");
@@ -310,58 +336,16 @@ public class Main {
                 input.nextLine();
             }
         } while (!exit);
-        return precio;
+        return nuevoPrecio;
+    }
+
+    public void modificarPrecio() {
+        ventas.get(index).setImporte(nuevoPrecio);
+        System.out.println("Venta modificada");
     }
 
 
-//    public void borrarVenta(){
-//            for(int i = 0; i < ventas.size(); i++){
-//                if (ventas.get(i).getArticulo().equals(nombre)){
-//                    if(ventas.get(i).getMes() == num){
-//                        if(ventas.get(i).getImporte() == precio){
-//                            ventas.remove(ventas.get(i));
-//                        }
-//
-//                    }
-//                }
-//            }
-//
-//    }
-
-//    public void borrarVenta(){
-//
-//        for(int j = 0; j < ventas.size(); j++) {
-//            Venta obj = ventas.get(j);
-//
-//            if (obj.getArticulo().equals(getnombre())) {
-//                if (obj.getMes() == getnumMes()) {
-//                    if (obj.getImporte() == getPrecioArt()) {
-//                        ventas.remove(j);
-//                    }
-
-
-    /*public void borrarVenta() {
-        for (Venta venta : ventas) {
-            if (venta.getArticulo().equals(nombre)) {
-                if (venta.getMes() == num) {
-                    if (venta.getImporte() == precio) {
-                        ventas.remove(venta);
-                    }
-                }
-            }
-        }*/
-    public void borrarVenta() {
-        Iterator<Venta> it = ventas.iterator();
-        while (it.hasNext()) {
-            if (it.next().getArticulo().equals(nombre)) {
-                if (it.next().getMes() == num) {
-                    if (it.next().getImporte() == precio) {
-                        it.remove();
-                    }
-                }
-            }
-        }
-    }
 }
+
 
 
