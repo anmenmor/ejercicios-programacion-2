@@ -6,21 +6,14 @@ import java.util.Scanner;
 public class Main {
 
     Scanner input = new Scanner(System.in);
-    ArrayList<Venta> ventas = new ArrayList<>();
-    String articulo;
-    int mes;
-    double importe;
-    int num = 0;
-    String nombre = null;
-    int index = -1;
-    double nuevoPrecio = -1;
 
     public static void main(String[] args) {
-        Ejercicio3.Main programa = new Ejercicio3.Main();
+        Main programa = new Main();
         programa.inicio();
     }
 
     public void inicio() {
+        ArrayList<Venta> ventas = new ArrayList<>();
         int opcion = 0;
         do {
             System.out.println("Elige la opción:");
@@ -31,53 +24,20 @@ public class Main {
                 input.nextLine();
                 switch (opcion) {
                     case 1:
-                        System.out.println("Introduce los datos");
-                        articulo = introduceArticulo();
-                        mes = introduceMes();
-                        importe = introduceImporte();
-                        añadirVenta(articulo, mes, importe);
+                        introducirVenta(ventas);
                         break;
                     case 2:
-                        if (estaVacio()) {
-                            break;
-                        } else {
-                            System.out.println("¿Qué mes quieres consultar?");
-                            num = getnumMes();
-                            mostrarVentasMes();
-                            break;
-                        }
+                        mostrarVentasDeUnMes(ventas);
+                        break;
                     case 3:
-                        if (estaVacio()) {
-                            break;
-                        } else {
-                            System.out.println("¿Qué artículo quieres consultar?");
-                            nombre = getnombre();
-                            mostrarVentasArticulo();
-                            break;
-                        }
+                        mostrarVentasDeUnArticulo(ventas);
+                        break;
                     case 4:
-                        if (estaVacio()) {
-                            break;
-                        } else {
-                            mostrarVentas();
-                            System.out.println("¿Qué venta quieres borrar?");
-                            index = getindex();
-                            borrarVenta();
-                            break;
-                        }
+                        borrarUnaVenta(ventas);
+                        break;
                     case 5:
-                        if (estaVacio()) {
-                            break;
-                        } else {
-                            mostrarVentas();
-                            System.out.println("¿Qué venta quieres modificar?");
-                            index = getindex();
-                            System.out.println("¿Qué importe quieres añadir?");
-                            nuevoPrecio = getNuevoPrecio();
-                            modificarPrecio();
-
-                            break;
-                        }
+                        modificarElImporteDeUnaVenta(ventas);
+                        break;
                     case 6:
                         System.out.println("Saliendo.");
                         break;
@@ -92,112 +52,150 @@ public class Main {
         } while (opcion != 6);
     }
 
+    private void modificarElImporteDeUnaVenta(ArrayList<Venta> lista) {
+        if (lista.isEmpty()) {
+            System.out.println("No hay registros");
+        } else {
+            mostrarVentas(lista);
+            System.out.println("¿Qué venta quieres modificar?");
+            int index = getindex(lista);
+            System.out.println("¿Qué importe quieres añadir?");
+            double nuevoPrecio = getNuevoPrecio();
+            modificarPrecio(lista, index, nuevoPrecio);
+        }
+    }
+
+    private void borrarUnaVenta(ArrayList<Venta> lista) {
+        if (lista.isEmpty()) {
+            System.out.println("No hay registros");
+        } else {
+            mostrarVentas(lista);
+            System.out.println("¿Qué venta quieres borrar?");
+            int index = getindex(lista);
+            borrarVenta(lista, index);
+        }
+    }
+
+    private void mostrarVentasDeUnArticulo(ArrayList<Venta> lista) {
+        if (lista.isEmpty()) {
+            System.out.println("No hay registros");
+        } else {
+            System.out.println("¿Qué artículo quieres consultar?");
+            String nombre = getnombre();
+            mostrarVentasArticulo(lista, nombre);
+        }
+    }
+
+    private void mostrarVentasDeUnMes(ArrayList<Venta> lista) {
+        if (lista.isEmpty()) {
+            System.out.println("No hay registros");
+        } else {
+            System.out.println("¿Qué mes quieres consultar?");
+            int numMes = getnumMes();
+            mostrarVentasMes(lista, numMes);
+        }
+    }
+
+    private void introducirVenta(ArrayList<Venta> lista) {
+        System.out.println("Introduce los datos");
+        String articulo = introduceArticulo();
+        int mes = introduceMes();
+        double importe = introduceImporte();
+        añadirVenta(articulo, mes, importe, lista);
+    }
+
     public String introduceArticulo() {
         String articuloIntroducido = "";
         do {
             System.out.println("Introduce articulo");
             articuloIntroducido = input.nextLine().trim();
-        } while (articuloIntroducido.isEmpty() || !articuloIntroducido.equals("running") && !articuloIntroducido.equals("asfalto") && !articuloIntroducido.equals("triatlon") && !articuloIntroducido.equals("trial"));
+        } while (articuloIntroducido.isEmpty() ||
+                (!articuloIntroducido.equals("running") && !articuloIntroducido.equals("asfalto") &&
+                        !articuloIntroducido.equals("triatlon") && !articuloIntroducido.equals("trial")));
         return articuloIntroducido;
     }
 
     public int introduceMes() {
-        boolean exit = false;
         int mesIntroducido = -1;
         do {
             System.out.println("Introduce el mes");
             boolean isNum = input.hasNextInt();
             if (isNum) {
                 mesIntroducido = input.nextInt();
-                if (mesIntroducido > 0 && mesIntroducido < 12) {
-                    exit = true;
-                } else {
+                input.nextLine();
+                if (mesIntroducido <= 0 || mesIntroducido > 12) {
                     System.out.println("Introduce un número entre 1 y 12");
                 }
             } else {
                 System.out.println("Introduce un entero");
                 input.nextLine();
             }
-        } while (!exit);
+        } while (mesIntroducido <= 0 || mesIntroducido > 12);
         return mesIntroducido;
     }
 
     public double introduceImporte() {
-        boolean exit = false;
         double importeIntroducido = -1;
         do {
             System.out.println("Introduce el importe");
             boolean isNum = input.hasNextDouble();
             if (isNum) {
                 importeIntroducido = input.nextDouble();
-                if (importeIntroducido > 0) {
-                    exit = true;
-                } else {
+                if (importeIntroducido <= 0) {
                     System.out.println("Introduce un número mayor a 0");
                 }
             } else {
                 System.out.println("Introduce un numero");
                 input.nextLine();
             }
-        } while (!exit);
+        } while (importeIntroducido <= 0);
         return importeIntroducido;
     }
 
-    public void añadirVenta(String articulo, int mes, double importe) {
+    public void añadirVenta(String articulo, int mes, double importe, ArrayList<Venta> lista) {
         Venta venta = new Venta(articulo, mes, importe);
-        ventas.add(venta);
-    }
-
-    public boolean estaVacio() {
-        if (ventas.isEmpty()) {
-            System.out.println("No hay datos introducidos");
-            return true;
-        } else {
-            return false;
-        }
+        lista.add(venta);
     }
 
     public int getnumMes() {
-        boolean exit = false;
-        int num = -1;
+        int numMes = -1;
         do {
             boolean isNum = input.hasNextInt();
             if (isNum) {
-                num = input.nextInt();
-                if (num > 0 && num < 12) {
-                    exit = true;
-                } else {
+                numMes = input.nextInt();
+                input.nextLine();
+                if (numMes <= 0 || numMes > 12){
                     System.out.println("Introduce un número entre 1 y 12");
                 }
             } else {
                 System.out.println("Introduce un entero");
                 input.nextLine();
             }
-        } while (!exit);
-        return num;
+        } while (numMes <= 0 || numMes > 12);
+        return numMes;
     }
 
-    public void mostrarVentasMes() {
+    public void mostrarVentasMes(ArrayList<Venta> lista, int numMes) {
         double ventasRunning = 0;
         double ventasAsfalto = 0;
         double ventasTriatlon = 0;
         double ventasTrial = 0;
         double ventasTotalesMes = 0;
-        for (int i = 0; i < ventas.size(); i++) {
-            if (ventas.get(i).getMes() == num) {
-                ventasTotalesMes += ventas.get(i).getImporte();
-                switch (ventas.get(i).getArticulo()) {
+        for (int i = 0; i < lista.size(); i++) {
+            if (lista.get(i).getMes() == numMes) {
+                ventasTotalesMes += lista.get(i).getImporte();
+                switch (lista.get(i).getArticulo()) {
                     case "running":
-                        ventasRunning += ventas.get(i).getImporte();
+                        ventasRunning += lista.get(i).getImporte();
                         break;
                     case "asfalto":
-                        ventasAsfalto += ventas.get(i).getImporte();
+                        ventasAsfalto += lista.get(i).getImporte();
                         break;
                     case "triatlon":
-                        ventasTriatlon += ventas.get(i).getImporte();
+                        ventasTriatlon += lista.get(i).getImporte();
                         break;
                     case "trial":
-                        ventasTrial += ventas.get(i).getImporte();
+                        ventasTrial += lista.get(i).getImporte();
                         break;
                 }
             }
@@ -212,12 +210,15 @@ public class Main {
     public String getnombre() {
         String nombre = "";
         do {
+            System.out.println("Introduce articulo");
             nombre = input.nextLine().trim();
-        } while (nombre.isEmpty() || !nombre.equals("running") && !nombre.equals("asfalto") && !nombre.equals("triatlon") && !nombre.equals("trial"));
+        } while (nombre.isEmpty() ||
+                (!nombre.equals("running") && !nombre.equals("asfalto") &&
+                        !nombre.equals("triatlon") && !nombre.equals("trial")));
         return nombre;
     }
 
-    public void mostrarVentasArticulo() {
+    public void mostrarVentasArticulo(ArrayList<Venta> lista, String nombre) {
         double ventasEnero = 0;
         double ventasFebrero = 0;
         double ventasMarzo = 0;
@@ -231,47 +232,46 @@ public class Main {
         double ventasNoviembre = 0;
         double ventasDiciembre = 0;
         double ventasTotalesArticulo = 0;
-        for (int i = 0; i < ventas.size(); i++) {
-            if (ventas.get(i).getArticulo().equals(nombre)) {
-                ventasTotalesArticulo += ventas.get(i).getImporte();
-                switch (ventas.get(i).getMes()) {
+        for (int i = 0; i < lista.size(); i++) {
+            if (lista.get(i).getArticulo().equals(nombre)) {
+                ventasTotalesArticulo += lista.get(i).getImporte();
+                switch (lista.get(i).getMes()) {
                     case 1:
-                        ventasEnero += ventas.get(i).getImporte();
+                        ventasEnero += lista.get(i).getImporte();
                         break;
                     case 2:
-                        ventasFebrero += ventas.get(i).getImporte();
+                        ventasFebrero += lista.get(i).getImporte();
                         break;
                     case 3:
-                        ventasMarzo += ventas.get(i).getImporte();
+                        ventasMarzo += lista.get(i).getImporte();
                         break;
                     case 4:
-                        ventasAbril += ventas.get(i).getImporte();
+                        ventasAbril += lista.get(i).getImporte();
                         break;
                     case 5:
-                        ventasMayo += ventas.get(i).getImporte();
+                        ventasMayo += lista.get(i).getImporte();
                         break;
                     case 6:
-                        ventasJunio += ventas.get(i).getImporte();
+                        ventasJunio += lista.get(i).getImporte();
                         break;
                     case 7:
-                        ventasJulio += ventas.get(i).getImporte();
+                        ventasJulio += lista.get(i).getImporte();
                         break;
                     case 8:
-                        ventasAgosto += ventas.get(i).getImporte();
+                        ventasAgosto += lista.get(i).getImporte();
                         break;
                     case 9:
-                        ventasSeptiembre += ventas.get(i).getImporte();
+                        ventasSeptiembre += lista.get(i).getImporte();
                         break;
                     case 10:
-                        ventasOctubre += ventas.get(i).getImporte();
+                        ventasOctubre += lista.get(i).getImporte();
                         break;
                     case 11:
-                        ventasNoviembre += ventas.get(i).getImporte();
+                        ventasNoviembre += lista.get(i).getImporte();
                         break;
                     case 12:
-                        ventasDiciembre += ventas.get(i).getImporte();
+                        ventasDiciembre += lista.get(i).getImporte();
                         break;
-
                 }
             }
         }
@@ -290,57 +290,53 @@ public class Main {
         System.out.println("El total de ventas es: " + ventasTotalesArticulo);
     }
 
-    public void mostrarVentas() {
-        for (int i = 0; i < ventas.size(); i++) {
-            System.out.println(i + " - " + ventas.get(i).toString());
+    public void mostrarVentas(ArrayList<Venta> lista) {
+        for (int i = 0; i < lista.size(); i++) {
+            System.out.println(i + " - " + lista.get(i).toString());
         }
     }
 
-    public int getindex() {
-        boolean exit = false;
+    public int getindex(ArrayList<Venta> lista) {
+        int index = -1;
         do {
             boolean isNum = input.hasNextInt();
             if (isNum) {
                 index = input.nextInt();
-                if (index >= 0 && index <= ventas.size() - 1) {
-                    exit = true;
-                } else {
+                if (index < 0 || index >= lista.size()){
                     System.out.println("Introduce un número correcto");
                 }
             } else {
                 System.out.println("Introduce un entero");
                 input.nextLine();
             }
-        } while (!exit);
+        } while (index < 0 || index >= lista.size());
         return index;
     }
 
-    public void borrarVenta(){
-        ventas.remove(index);
+    public void borrarVenta(ArrayList<Venta> lista, int index){
+        lista.remove(index);
         System.out.println("venta borrada");
     }
 
     public double getNuevoPrecio() {
-        boolean exit = false;
+        double nuevoPrecio = -1;
         do {
             boolean isNum = input.hasNextDouble();
             if (isNum) {
-                nuevoPrecio = input.nextDouble();
-                if (nuevoPrecio > 0) {
-                    exit = true;
-                } else {
+                 nuevoPrecio = input.nextDouble();
+                if (nuevoPrecio <= 0) {
                     System.out.println("Introduce un número mayor a 0");
                 }
             } else {
                 System.out.println("Introduce un numero");
                 input.nextLine();
             }
-        } while (!exit);
+        } while (nuevoPrecio <= 0);
         return nuevoPrecio;
     }
 
-    public void modificarPrecio() {
-        ventas.get(index).setImporte(nuevoPrecio);
+    public void modificarPrecio(ArrayList<Venta> lista, int index, double nuevoPrecio) {
+        lista.get(index).setImporte(nuevoPrecio);
         System.out.println("Venta modificada");
     }
 

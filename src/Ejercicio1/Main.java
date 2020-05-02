@@ -19,17 +19,16 @@ public class Main {
             System.out.println("1. Ingresar. \n2. Retirar. \n3. Salir.");
             if (input.hasNextInt()) {
                 opcion = input.nextInt();
-                input.nextLine();
                 switch (opcion) {
                     case 1:
-                        System.out.println("saldo: " + saldo);
+                        System.out.println("El saldo es: " + saldo);
                         saldo = cuenta1.ingresar(getCantidad());
-                        System.out.println("saldo: " + saldo);
+                        System.out.println("El saldo es: " + saldo);
                         break;
                     case 2:
-                        System.out.println("saldo: " + saldo);
+                        System.out.println("El saldo es: " + saldo);
                         saldo = cuenta1.retirar(getCantidad());
-                        System.out.println("saldo: " + saldo);
+                        System.out.println("El saldo es: " + saldo);
                         break;
                     case 3:
                         System.out.println("Saliendo");

@@ -19,10 +19,8 @@ public class Cuenta {
     public double ingresar(double cantidad){
         if(cantidad >= 0){
            saldo += cantidad;
-           return saldo;
-        }else{
-            return saldo;
         }
+        return saldo;
     }
     public double retirar(double cantidad){
         if(cantidad < 0){
